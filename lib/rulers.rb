@@ -12,7 +12,11 @@ module Rulers
       klass, act = get_controller_and_action(env)
 
       controller = klass.new(env)
-      text = controller.send(act)
+      begin
+        text = controller.send(act)
+      rescue RuntimeError
+        return [500, { 'content-type' => 'text/html' }, ['An error was raised']]
+      end
       [
         200,
         { 'content-type' => 'text/html' },
