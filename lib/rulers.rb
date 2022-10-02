@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/MethodLength
 # frozen_string_literal: true
 
 require_relative 'rulers/version'
@@ -7,9 +8,19 @@ require 'rulers/routing'
 module Rulers
   class Application
     def call(env)
-      return [404, { 'content-type' => 'text/html' }, []] if env['PATH_INFO'] == '/favicon.ico'
-
-      klass, act = get_controller_and_action(env)
+      case env['PATH_INFO']
+      when '/favicon.ico'
+        return [404, { 'content-type' => 'text/html' }, []]
+      when '/'
+        #   act = :a_quote
+        #   klass = QuotesController
+        # return [200, { 'content-type' => 'text/html' }, [File.read('public/index.html')]]
+        # act = :index
+        # klass = HomeController
+        return [302, { 'Location' => '/home/index' }, []]
+      else
+        klass, act = get_controller_and_action(env)
+      end
 
       controller = klass.new(env)
       begin
@@ -33,3 +44,4 @@ module Rulers
     end
   end
 end
+# rubocop:enable Metrics/MethodLength
