@@ -3,6 +3,9 @@
 
 require_relative 'rulers/version'
 require 'rulers/routing'
+require 'rulers/dependencies'
+require 'rulers/util'
+
 # require "rulers/array"
 
 module Rulers
