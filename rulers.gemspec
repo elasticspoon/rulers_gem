@@ -37,6 +37,7 @@ Gem::Specification.new do |spec|
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
 
+  spec.add_runtime_dependency 'erubis'
   spec.add_runtime_dependency 'rack', '~> 2.2.4'
 
   spec.add_development_dependency 'minitest', '~> 5.16'

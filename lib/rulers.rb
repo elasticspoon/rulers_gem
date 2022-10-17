@@ -5,6 +5,7 @@ require_relative 'rulers/version'
 require 'rulers/routing'
 require 'rulers/dependencies'
 require 'rulers/util'
+require 'rulers/controller'
 
 # require "rulers/array"
 
@@ -36,14 +37,6 @@ module Rulers
         { 'content-type' => 'text/html' },
         [text]
       ]
-    end
-  end
-
-  class Controller
-    attr_reader :env
-
-    def initialize(env)
-      @env = env
     end
   end
 end
