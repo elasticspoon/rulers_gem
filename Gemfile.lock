@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    rulers (0.0.4)
+    rulers (0.0.5)
       erubis
+      multi_json
       rack (~> 2.2.4)
 
 GEM
@@ -13,6 +14,7 @@ GEM
     erubis (2.7.0)
     json (2.6.2)
     minitest (5.16.3)
+    multi_json (1.15.0)
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
