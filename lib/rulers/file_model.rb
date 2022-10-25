@@ -4,6 +4,8 @@ require 'multi_json'
 module Rulers
   module Model
     class FileModel
+      @model_storage = {}
+
       def initialize(filename)
         @filename = filename
 
@@ -24,7 +26,7 @@ module Rulers
       end
 
       def self.find(id)
-        FileModel.new("db/quotes/#{id}.json")
+        @model_storage[id] ||= FileModel.new("db/quotes/#{id}.json")
       rescue StandardError
         nil
       end
@@ -54,6 +56,26 @@ module Rulers
         TEMPLATE
 
         FileModel.new "db/quotes/#{id}.json"
+      end
+
+      def save
+        File.write(@filename, MultiJson.dump(@hash))
+      end
+
+      def self.find_all_by(param, value)
+        all.select { |file| file[param.to_s] == value }
+      end
+
+      def self.method_missing(method_name, *args)
+        if method_name.to_s =~ /find_all_by_(.*)/
+          send(:find_all_by, ::Regexp.last_match(1), *args)
+        else
+          super
+        end
+      end
+
+      def self.respond_to_missing?(method_name, include_private=false)
+        method_name.to_s.start_with('find_all_by_') || super
       end
     end
   end
