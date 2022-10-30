@@ -33,11 +33,14 @@ module Rulers
       rescue RuntimeError
         return [500, { 'content-type' => 'text/html' }, ['An error was raised']]
       end
-      [
-        200,
-        { 'content-type' => 'text/html' },
-        [text]
-      ]
+      controller_response = controller.get_response
+      if controller_response
+        status, headers, c_response = controller_response.to_a
+        # [status, headers, [c_response].flatten] # removed .body call, it got changed at some point?
+      else
+        status, headers, c_response = controller.render_response(act).to_a
+      end
+      [status, headers, [c_response].flatten]
     end
   end
 end
