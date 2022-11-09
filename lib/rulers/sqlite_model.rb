@@ -11,6 +11,19 @@ module Rulers
         @hash = data
       end
 
+      def method_missing(method, *args, &)
+        return super unless @hash&.include?(method.to_s)
+
+        send(:define_singleton_method, method.to_sym) do
+          @hash[method.to_s]
+        end
+        send(method.to_sym)
+      end
+
+      def respond_to_missing?(method, *)
+        @hash&.include?(method.to_s) || super
+      end
+
       def self.to_sql(val)
         case val
         when Numeric
@@ -21,6 +34,11 @@ module Rulers
           raise "Can't change #{val.class} to SQL"
         end
       end
+
+      # def self.from_sql(col_name, _col_type)
+      #   # if @hash && @hash[col_name] &&
+      #   puts schema[col_name].inspect
+      # end
 
       def self.create(values)
         values.delete 'id'
