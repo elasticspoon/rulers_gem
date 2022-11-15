@@ -15,7 +15,7 @@ module Rulers
       @request ||= Rack::Request.new(@env)
     end
 
-    def response(text, status=200, headers={})
+    def response(text, status=200, headers={ 'content-type' => 'text/html' })
       raise 'Already responded!' if @response
 
       response_text = [text].flatten
