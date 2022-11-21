@@ -9,6 +9,42 @@ module Rulers
 
     def initialize(env)
       @env = env
+      @routing_params = {}
+    end
+
+    def dispatch_other(action, routing_params={})
+      puts "Dispatching #{action}"
+      @routing_params = routing_params
+      text = send(action)
+      if get_response
+        status, headers, response = get_response.to_a
+        [status, headers, [response].flatten]
+      else
+        [200, { 'Content-Type' => 'text/html' }, [text].flatten]
+      end
+    end
+
+    def dispatch(action, routing_params={})
+      @routing_params = routing_params
+      begin
+        send(action)
+      rescue RuntimeError # might not be needed with the controller mapping with Rack
+        return [500, { 'content-type' => 'text/html' }, ['An error was raised']]
+      end
+      controller_response = get_response
+      if controller_response
+        status, headers, response = controller_response.to_a
+        [status, headers, [response].flatten]
+      else
+        status, headers, response = render_response(action).to_a
+      end
+      [status, headers, [response].flatten]
+    end
+
+    def self.action(action, response={})
+      puts "Action: #{action}"
+      puts "Response: #{response}"
+      proc { |env| new(env).dispatch(action, response) }
     end
 
     def request
@@ -23,15 +59,22 @@ module Rulers
     end
 
     def get_response
+      puts "response: #{@response}"
       @response
     end
 
     def render_response(*args)
+      puts "render_response: #{args}"
       response(render(*args))
     end
 
     def params
-      request.params
+      old_params = request.params
+      puts "old_params: #{old_params}"
+      puts "routing_params: #{@routing_params}"
+      params = request.params.merge(@routing_params)
+      puts "params: #{params}"
+      params
     end
 
     def render(view_name, locals={})

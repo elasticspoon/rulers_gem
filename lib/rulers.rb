@@ -1,4 +1,3 @@
-# rubocop:disable Metrics/MethodLength
 # frozen_string_literal: true
 
 require_relative 'rulers/version'
@@ -13,35 +12,44 @@ require 'rulers/file_model'
 module Rulers
   class Application
     def call(env)
-      case env['PATH_INFO']
-      when '/favicon.ico'
-        return [404, { 'content-type' => 'text/html' }, []]
-      when '/'
-        #   act = :a_quote
-        #   klass = QuotesController
-        # return [200, { 'content-type' => 'text/html' }, [File.read('public/index.html')]]
-        # act = :index
-        # klass = HomeController
-        return [302, { 'Location' => '/home/index' }, []]
-      else
-        klass, act = get_controller_and_action(env)
-      end
+      # case env['PATH_INFO']
+      # when '/favicon.ico'
+      #   return [404, { 'content-type' => 'text/html' }, []]
+      #   # when '/'
+      #   #   act = :a_quote
+      #   #   klass = QuotesController
+      #   # return [200, { 'content-type' => 'text/html' }, [File.read('public/index.html')]]
+      #   # act = :index
+      #   # klass = HomeController
+      #   # return [302, { 'Location' => '/home/index' }, []]
+      # else
+      #   klass, act = get_controller_and_action(env)
+      # end'
+      return [404, { 'content-type' => 'text/html' }, []] if env['PATH_INFO'] == '/favicon.ico'
 
-      controller = klass.new(env)
-      begin
-        text = controller.send(act)
-      rescue RuntimeError
-        return [500, { 'content-type' => 'text/html' }, ['An error was raised']]
-      end
-      controller_response = controller.get_response
-      if controller_response
-        status, headers, c_response = controller_response.to_a
-        # [status, headers, [c_response].flatten] # removed .body call, it got changed at some point?
-      else
-        status, headers, c_response = controller.render_response(act).to_a
-      end
-      [status, headers, [c_response].flatten]
+      # puts "Calling #{klass}##{act.inspect}"
+
+      rack_app = get_rack_app(env)
+      rack_app.call(env)
+
+      # rack_app = klass.action(act)
+      # rack_app.call(env)
+
+      # controller = klass.new(env)
+
+      # begin
+      #   controller.send(act)
+      # rescue RuntimeError
+      #   return [500, { 'content-type' => 'text/html' }, ['An error was raised']]
+      # end
+      # controller_response = controller.get_response
+      # if controller_response
+      #   status, headers, c_response = controller_response.to_a
+      #   # [status, headers, [c_response].flatten] # removed .body call, it got changed at some point?
+      # else
+      #   status, headers, c_response = controller.render_response(act).to_a
+      # end
+      # [status, headers, [c_response].flatten]
     end
   end
 end
-# rubocop:enable Metrics/MethodLength
